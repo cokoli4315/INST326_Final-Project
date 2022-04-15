@@ -7,3 +7,14 @@ The written testing procedure should consist of precise instructions to a human 
 how to test each function or method that cannot be unit-tested and how to determine whether the test was successful.
 Your unit tests (required) and written test procedure (if you write one) should be part of your Bitbucket or GitHub repository.
 """
+# only need happy cases
+
+from imdb.Person import Person
+from imdb import Cinemagoer
+import praw
+
+# example code NOT IN FINAL
+imdb = Cinemagoer()
+movie = imdb.get_movie('0109830')
+if movie.get('title') != "Forrest Gump":
+    return False
