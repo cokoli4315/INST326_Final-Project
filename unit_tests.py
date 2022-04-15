@@ -17,4 +17,22 @@ import praw
 imdb = Cinemagoer()
 movie = imdb.get_movie('0109830')
 if movie.get('title') != "Forrest Gump":
-    return False
+    print('False')
+
+# get access to reddit
+reddit = praw.Reddit(
+    client_id="my client id",
+    client_secret="my client secret",
+    user_agent="my user agent",
+    username="my username",
+    password="my password",
+)
+
+#get access to r/movies
+movies_sub = reddit.subreddit("movies")
+#goes through 10 most recent posts on r/movies and prints info about them
+for submission in movies_sub.new(limit=10):
+    print(submission.title)
+    print(submission.score)
+    print(submission.id)
+    print(submission.url)
