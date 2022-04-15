@@ -24,6 +24,7 @@ class Actor:
         awards (list): btwn 3-5 awards"""
     # ask if init counts as a function
     def __init__(self, person_id):
+        """Sets the attributes for the Actor."""
         pass
     
     def get_popular_movies(self, person_id):
