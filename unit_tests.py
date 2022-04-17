@@ -31,8 +31,8 @@ def test_find_actor_name():
 def test_find_actor_page():
     # if find_actor_name returns None, find_actor_page is not called
     # fix leading zeros
-    assert fp.find_actor_page("Nicolas Cage") == 0000115
-    assert fp.find_actor_page("Ryan Reynolds") == 0005351
+    assert fp.find_actor_page("Nicolas Cage") == 0000115#this returns true if the post_id is assigned to Nicolas Cage
+    assert fp.find_actor_page("Ryan Reynolds") == 0005351#returns true if post_id is assigned to Ryan Reynolds
 
 def test_create_comment():
     # write the actual comment strings
