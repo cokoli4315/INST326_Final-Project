@@ -17,8 +17,8 @@ class Actor:
         age (int): current age of actor
         dob (str): date of birth of actor
         pob (str): place actor was born
-        movies (list): 3-5 of the actor's most populat movies with title & year released
-        awards (list): 3-5 of the actor's most recent awards
+        movies (list of strings): 3-5 of the actor's most popular movies with title & year released
+        awards (list of strings): 3-5 of the actor's most recent awards
     """
 
     def __init__(self, actor_id):
@@ -30,6 +30,7 @@ class Actor:
         Side Effects:
             Sets name, age, dob, pob, movies, and awards attributes
         """
+        # calls get_popular_movies() & get_recent_awards() to set movies & awards attributes
         pass
     
     def get_popular_movies(self, actor_id):
@@ -37,22 +38,29 @@ class Actor:
         
         Args:
             actor_id (int): the IMDB id of the actor
+            
+        Returns:
+            movies (list of strings): 3-5 of the actor's most popular movies with title & year released
         """
         pass
     
     def get_recent_awards(self, actor_id):
-        """gets 3-5 of the most recent awards the actor won.
+        """Gets 3-5 of the most recent awards the actor won.
         
         Args:
             actor_id (int): the IMDB id of the actor
+            
+        Returns:
+            awards (list of strings): 3-5 of the actor's most recent awards 
         """
         pass
     
-def get_post(subreddit):
+def get_post(reddit, subreddit):
     """Accesses each post in r/movies.
     
     Args:
-        subreddit: the subreddit we are looking through
+        reddit (Reddit object): current instance of Reddit 
+        subreddit (str): the name of the subreddit we are looking through
         
     Returns:
         post_id (int): the ID number of the Reddit post currently being looked at
