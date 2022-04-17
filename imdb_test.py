@@ -23,3 +23,9 @@ for genre in movie['genres']:
 people = ia.search_person('Mel Gibson')
 for person in people:
    print(person.personID, person['name'])
+   
+# example code
+imdb = Cinemagoer()
+movie = imdb.get_movie('0109830')
+if movie.get('title') != "Forrest Gump":
+    print('False')
