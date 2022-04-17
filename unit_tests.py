@@ -9,30 +9,33 @@ Your unit tests (required) and written test procedure (if you write one) should 
 """
 # only need happy cases
 
-from imdb.Person import Person
-from imdb import Cinemagoer
-import praw
+import inst326_final_project as fp
 
-# example code NOT IN FINAL
-imdb = Cinemagoer()
-movie = imdb.get_movie('0109830')
-if movie.get('title') != "Forrest Gump":
-    print('False')
+def test_get_post():
+    assert fp.get_post("movies") == #Nic Cage post id
+    assert fp.get_post("movies") == #Blade Runner post id
+    assert fp.get_post("movies") == #21 years post id
+    assert fp.get_post("movies") == #Ryan Reynolds post id
 
-# get access to reddit
-reddit = praw.Reddit(
-    client_id="my client id",
-    client_secret="my client secret",
-    user_agent="my user agent",
-    username="my username",
-    password="my password",
-)
+def test_get_title():
+    assert fp.get_title(post_id) == "Nicolas Cage Says He's Done His Best Work in the Last 10 Years"
+    assert fp.get_title(post_id) == "Blade Runner (1982) Deckard never speaks to Roy, is there any other movie that never has the protagonist speak to the antagonist?"
+    assert fp.get_title(post_id) == "21 years since Rat Race, Its time for another \"Big ensemble cast of actors chase around America for money\" movie"
+    assert fp.get_title(post_id) == "Ryan Reynolds To Narrate Discovery+ Documentary 'Curb Your Carbon'"
 
-#get access to r/movies
-movies_sub = reddit.subreddit("movies")
-#goes through 10 most recent posts on r/movies and prints info about them
-for submission in movies_sub.new(limit=10):
-    print(submission.title)
-    print(submission.score)
-    print(submission.id)
-    print(submission.url)
+def test_find_actor_name():
+    assert fp.find_actor_name("Nicolas Cage Says He's Done His Best Work in the Last 10 Years") == "Nicolas Cage"
+    assert fp.find_actor_name("Blade Runner (1982) Deckard never speaks to Roy, is there any other movie that never has the protagonist speak to the antagonist?") == None
+    assert fp.find_actor_name("21 years since Rat Race, Its time for another \"Big ensemble cast of actors chase around America for money\" movie") == None
+    assert fp.find_actor_name("Ryan Reynolds To Narrate Discovery+ Documentary 'Curb Your Carbon'") == "Ryan Reynolds"
+
+
+def test_find_actor_page():
+    assert fp.find_actor_page("Nicolas Cage") == 0000115
+    assert fp.find_actor_page("Ryan Reynolds") == 0005351
+
+def test_create_comment():
+    nic_cage = fp.Actor(fp.find_actor_page("Nicolas Cage"))
+    assert fp.create_comment(nic_cage) == "comment"
+    ryan_reynolds = fp.Actor(fp.find_actor_page("Ryan Reynolds"))
+    assert fp.create_comment(ryan_reynolds) == "comment"
