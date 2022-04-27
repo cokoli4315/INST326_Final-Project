@@ -58,45 +58,31 @@ class Actor:
         """
         pass
     
-def get_post_title(reddit, subreddit):
+def get_post(post):
     """Accesses each post in r/movies.
     
     Args:
-        reddit (Reddit object): current instance of Reddit 
-        subreddit (str): the name of the subreddit we are looking through
+        post (Reddit object): current Reddit post being examined
         
     Returns:
-        post_id (int): the ID number of the Reddit post currently being looked at
+        a tuple with the title (str) and the ID number (int) of the Reddit post currently being looked at
     """
-    #get access to r/movies, fix for final
-    movies_sub = reddit.subreddit("movies")
-    #goes through 10 most recent posts on r/movies and prints info about them, not in final just an example
-    for submission in movies_sub.new(limit=10):
-        return submission.title, submission.id # return this, fix for final
-
-def get_title(post_id):
-    """Accesses the title of each post. 
-    
-    Args:
-        post_id (int): the ID of the post being examined.
-        
-    Returns:
-        post_title (str): the title of the post
-    """
-    return post_id.title
+    return post.title, post.id
 
 # Chikezie        
-def find_actor_name(post_title):
+def find_actor(post_title):
     """Looks for an actor's name in the title of a post using regex.
     
     Args:
         post_title (str): the title of the post being examined
         
     Returns:
-        actor_name (str): the name of the actor if found
+        page_id (int): the IMDB page id of the actor's page taken from find_actor_page
     """
     # sep title w/ spaces, loop thru title, once a regex match is found call find_actor_page(), 
-    # if f_a_p() does not find a match continue looking thru, title for a name until you reach the end
+    # if find_actor_page() does not find a match continue looking thru the post title for a name until you reach the end
+    # return None if no actor name was found
+    # if an actor is found return page_id (from find_actor_page())
     pass
 
 # Chikezie
@@ -137,8 +123,7 @@ def publish_comment(post_id, comment):
 
 # McKenna & Declan
 def main():
-    """Runs the entire program. Calls get_posts(), calls get_title() for each post, calls find_actor_name() for title, 
-    if an actor's name is found calls find_actor_page(), if a page for the actor is found creates an Actor instance, 
+    """Runs the entire program. Calls get_post(), calls find_actor() using title, if a page for the actor is found creates an Actor instance, 
     calls create_comment() using the Actor instance, calls publish_comment() using the return of create_comment()"""
     # gets access to reddit, just an example not in final
     reddit = praw.Reddit(
@@ -151,8 +136,15 @@ def main():
     
     movies_sub = reddit.subreddit("movies")
     for submission in movies_sub.new(limit=10):
-        call get_post_title()
+        post_title, post_id = get_post(submission)
+        actor_page = find_actor(post_title)
         
+        # is imdb page ID & actor ID the same?
+        if actor_page != None:
+            actor = Actor(actor_page)
+            
+            comment = create_comment(actor)
+            publish_comment(post_id, comment)
 
 if __name__ == "__main__":
     # calls main to run program
