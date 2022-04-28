@@ -1,9 +1,9 @@
-from imdb.Person import Person
+#from imdb.Person import Person
 from imdb import Cinemagoer
 
-print(Person.default_info)
+#print(Person.default_info)
 
-# create an instance of the Cinemagoer class
+"""# create an instance of the Cinemagoer class
 ia = Cinemagoer()
 
 # get a movie
@@ -22,10 +22,34 @@ for genre in movie['genres']:
 # search for a person name
 people = ia.search_person('Mel Gibson')
 for person in people:
-   print(person.personID, person['name'])
+   print(person.personID, person['name'])"""
    
 # example code
 imdb = Cinemagoer()
-movie = imdb.get_movie('0109830')
+"""movie = imdb.get_movie('0109830')
 if movie.get('title') != "Forrest Gump":
-    print('False')
+    print('False')"""
+    
+#movie = ia.get_movie('0094226', info=['taglines', 'plot'])
+#movie.infoset2keys
+
+# {'main': ['birth info', 'headshot', 'akas', 'filmography', 'in development', 'imdbID', 'name'], 
+# 'biography': ['headshot', 'nick names', 'birth name', 'height', 'mini biography', 'trade mark', 'trivia', 'quotes', 'salary history', 'birth date', 'birth notes']}
+nic_cage = imdb.get_person('0000115')
+print(nic_cage.get('name'))
+nic_birthday = nic_cage.get('birth date') #1964-01-07
+
+birthday_list = nic_birthday.split('-')
+import datetime
+ 
+today = datetime.date.today()
+birthdate = datetime.date(int(birthday_list[0]), int(birthday_list[1]), int(birthday_list[2]))
+age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+print(age)
+
+datetimeobject = datetime.datetime.strptime(nic_birthday, '%Y-%m-%d')
+new_format = datetimeobject.strftime('%B %d, %Y')
+print(new_format)
+
+nic_birth = nic_cage.get('birth info')['birth place']
+print(nic_birth)

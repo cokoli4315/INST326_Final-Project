@@ -11,6 +11,7 @@ import json
 from nis import match
 from imdb.Person import Person
 from imdb import Cinemagoer
+import datetime
 import praw
 import re
 import requests
@@ -39,9 +40,26 @@ class Actor:
         Side Effects:
             Sets name, age, dob, pob, movies, and awards attributes
         """
-        # calls get_popular_movies() & get_recent_awards() to set movies & awards attributes
-        pass
-    
+        imdb = Cinemagoer()
+
+        actor = imdb.get_person('0000115')
+        self.name = actor.get('name')
+        
+        birthday = actor.get('birth date')
+        birthday_list = birthday.split('-')
+        
+        today = datetime.date.today()
+        birthdate = datetime.date(int(birthday_list[0]), int(birthday_list[1]), int(birthday_list[2]))
+        self.age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+        
+        datetime_birthday = datetime.datetime.strptime(birthday, '%Y-%m-%d')
+        self.dob = datetime_birthday.strftime('%B %d, %Y')
+        
+        self.pob = actor.get('birth info')['birth place']
+        
+        self.movies = self.get_popular_movies(actor_id)
+        self.awards = self.get_recent_awards(actor_id)
+
     def get_popular_movies(self, actor_id):
         """Gets 3-5 of the most popular movies with the actor.
         
@@ -64,43 +82,28 @@ class Actor:
         """
         pass
     
-def get_post_title(reddit, subreddit):
+def get_post(post):
     """Accesses each post in r/movies.
     
     Args:
-        reddit (Reddit object): current instance of Reddit 
-        subreddit (str): the name of the subreddit we are looking through
+        post (Reddit object): current Reddit post being examined
         
     Returns:
-        post_id (int): the ID number of the Reddit post currently being looked at
+        a tuple with the title (str) and the ID number (int) of the Reddit post currently being looked at
     """
-    #get access to r/movies, fix for final
-    movies_sub = reddit.subreddit("movies")
-    #goes through 10 most recent posts on r/movies and prints info about them, not in final just an example
-    for submission in movies_sub.new(limit=10):
-        return submission.title, submission.id # return this, fix for final
-
-def get_title(post_id):
-    """Accesses the title of each post. 
-    
-    Args:
-        post_id (int): the ID of the post being examined.
-        
-    Returns:
-        post_title (str): the title of the post
-    """
-    return post_id.title
+    return post.title, post.id
 
 # Chikezie        
-def find_actor_name(post_title):
+def find_actor(post_title):
     """Looks for an actor's name in the title of a post using regex.
     
     Args:
         post_title (str): the title of the post being examined
         
     Returns:
-        actor_name (str): the name of the actor if found
+        page_id (int): the IMDB page id of the actor's page taken from find_actor_page
     """
+<<<<<<< HEAD
     actor_names=[]
     tsv_file=open("data.tsv")
     read_tsv=csv.reader(tsv_file,delimiter="\t")
@@ -117,6 +120,13 @@ def find_actor_name(post_title):
         
        
     return actor_name
+=======
+    # sep title w/ spaces, loop thru title, once a regex match is found call find_actor_page(), 
+    # if find_actor_page() does not find a match continue looking thru the post title for a name until you reach the end
+    # return None if no actor name was found
+    # if an actor is found return page_id (from find_actor_page())
+    pass
+>>>>>>> 134596a4626d89f86836efbbdc68ae26d99e863d
 
 # Chikezie
 def find_actor_page(actor_name):
@@ -160,7 +170,8 @@ def create_comment(actor):
     Returns:
         comment (str): hold all the info about the actor parameter
     """
-    # ex: f"Actor's Name: {actor.name}\n Actor's Age: {} \n"
+    # ex: f"Actor's Name: {actor.name}\n Actor's Age: {actor.age} \n"
+    # actor.age calculated in actor class init
     pass
 
 # Surafel
@@ -176,8 +187,7 @@ def publish_comment(post_id, comment):
 
 # McKenna & Declan
 def main():
-    """Runs the entire program. Calls get_posts(), calls get_title() for each post, calls find_actor_name() for title, 
-    if an actor's name is found calls find_actor_page(), if a page for the actor is found creates an Actor instance, 
+    """Runs the entire program. Calls get_post(), calls find_actor() using title, if a page for the actor is found creates an Actor instance, 
     calls create_comment() using the Actor instance, calls publish_comment() using the return of create_comment()"""
     # gets access to reddit, just an example not in final
     reddit = praw.Reddit(
@@ -190,8 +200,15 @@ def main():
     
     movies_sub = reddit.subreddit("movies")
     for submission in movies_sub.new(limit=10):
-        call get_post_title()
+        post_title, post_id = get_post(submission)
+        actor_page = find_actor(post_title)
         
+        # is imdb page ID & actor ID the same?
+        if actor_page != None:
+            actor = Actor(actor_page)
+            
+            comment = create_comment(actor)
+            publish_comment(post_id, comment)
 
 if __name__ == "__main__":
     # calls main to run program
