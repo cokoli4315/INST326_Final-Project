@@ -6,10 +6,16 @@ Date: 4_14_22
 Challenges Encountered: 
 """
 # by Friday, 4/29: have Actor class mostly done, find_actor_name/page mostly done, & publish_comment mostly done
+import csv
+import json
+from nis import match
 from imdb.Person import Person
 from imdb import Cinemagoer
 import praw
 import re
+import requests
+
+
 
 # McKenna & Declan
 class Actor:
@@ -95,12 +101,26 @@ def find_actor_name(post_title):
     Returns:
         actor_name (str): the name of the actor if found
     """
-    # sep title w/ spaces, loop thru title, once a regex match is found call find_actor_page(), 
-    # if f_a_p() does not find a match continue looking thru, title for a name until you reach the end
-    pass
+    actor_names=[]
+    tsv_file=open("data.tsv")
+    read_tsv=csv.reader(tsv_file,delimiter="\t")
+
+    for row in read_tsv:
+        actor_names.append(row[1])
+
+    print(actor_names[1])
+
+    for indv in actor_names:
+        if indv in post_title:
+            actor_name=indv
+    tsv_file.close()
+        
+       
+    return actor_name
 
 # Chikezie
 def find_actor_page(actor_name):
+
     """Looks through IMDB for the actor's page.
     
     Args:
@@ -108,8 +128,27 @@ def find_actor_page(actor_name):
         
     Returns: 
         page_id (int): the IMDB page id of the actor's page
-    """
-    pass
+    """ 
+    
+    actor_names=[]
+    actor_id=[]
+    actor_id_name={}
+    tsv_file=open("data.tsv")
+    read_tsv=csv.reader(tsv_file,delimiter="\t")
+
+    for row in read_tsv:
+        actor_names.append(row[1])
+        actor_id.append(row[0])
+
+    index=-1
+    for indv in actor_names:
+        index+=1
+        for j in range(len(actor_id)):
+            actor_id_name[indv]=actor_id[index]
+
+    url=f"https://imdb-api.com/API/Name/k_gwul40q2/{actor_id_name[actor_name]}"
+
+    return actor_id_name[actor_name]
 
 # Surafel
 def create_comment(actor):
