@@ -8,6 +8,7 @@ Challenges Encountered:
 # by Friday, 4/29: have Actor class mostly done, find_actor_name/page mostly done, & publish_comment mostly done
 from imdb.Person import Person
 from imdb import Cinemagoer
+import datetime
 import praw
 import re
 
@@ -33,9 +34,26 @@ class Actor:
         Side Effects:
             Sets name, age, dob, pob, movies, and awards attributes
         """
-        # calls get_popular_movies() & get_recent_awards() to set movies & awards attributes
-        pass
-    
+        imdb = Cinemagoer()
+
+        actor = imdb.get_person('0000115')
+        self.name = actor.get('name')
+        
+        birthday = actor.get('birth date')
+        birthday_list = birthday.split('-')
+        
+        today = datetime.date.today()
+        birthdate = datetime.date(int(birthday_list[0]), int(birthday_list[1]), int(birthday_list[2]))
+        self.age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+        
+        datetime_birthday = datetime.datetime.strptime(birthday, '%Y-%m-%d')
+        self.dob = datetime_birthday.strftime('%B %d, %Y')
+        
+        self.pob = actor.get('birth info')['birth place']
+        
+        self.movies = self.get_popular_movies(actor_id)
+        self.awards = self.get_recent_awards(actor_id)
+
     def get_popular_movies(self, actor_id):
         """Gets 3-5 of the most popular movies with the actor.
         
@@ -107,7 +125,8 @@ def create_comment(actor):
     Returns:
         comment (str): hold all the info about the actor parameter
     """
-    # ex: f"Actor's Name: {actor.name}\n Actor's Age: {} \n"
+    # ex: f"Actor's Name: {actor.name}\n Actor's Age: {actor.age} \n"
+    # actor.age calculated in actor class init
     pass
 
 # Surafel
