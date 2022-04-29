@@ -175,6 +175,7 @@ def publish_comment(post_id, comment):
         post_id (int): the ID of the post that has the actor's name in it
         comment (str): the comment that will be published to the post
     """
+    post_id.reply(comment) 
     # take comment & publish it to reddit post_id as a comment (look at Reddit API on how to do that)
     pass
 
