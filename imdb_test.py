@@ -65,8 +65,8 @@ for film in nic_films['actor'][0:5]:
 import requests
 from bs4 import BeautifulSoup
 
-actor_page = f"https://www.imdb.com/name/nm{nic_cage.get('imdbID')}/"
-request_page = requests.get(actor_page)
+actor_awards_page = f"https://www.imdb.com/name/nm{nic_cage.get('imdbID')}/awards?ref_=nm_awd"
+request_page = requests.get(actor_awards_page)
 soup = BeautifulSoup(request_page.text, "html.parser")
-known_for = soup.findAll("Known For")
+known_for = soup.findAll("")
 print(known_for)

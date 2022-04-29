@@ -67,7 +67,7 @@ class Actor:
         Returns:
             works (list of strings): 3-5 of the actor's most popular movies/shows with title & year released
         """
-        # uses web scraping since Cinemagoer does not store actor's "Known For" list
+        # uses data.tsv file since Cinemagoer does not store actor's "Known For" list
         pass
     
     def get_recent_awards(self, actor_id):
