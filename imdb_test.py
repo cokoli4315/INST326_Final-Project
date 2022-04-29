@@ -68,5 +68,5 @@ from bs4 import BeautifulSoup
 actor_page = f"https://www.imdb.com/name/nm{nic_cage.get('imdbID')}/"
 request_page = requests.get(actor_page)
 soup = BeautifulSoup(request_page.text, "html.parser")
-links =  soup.findAll("a")
-print(links)
+known_for = soup.findAll("Known For")
+print(known_for)
