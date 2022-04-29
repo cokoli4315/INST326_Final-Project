@@ -30,7 +30,7 @@ imdb = Cinemagoer()
 if movie.get('title') != "Forrest Gump":
     print('False')"""
     
-#movie = ia.get_movie('0094226', info=['taglines', 'plot'])
+# movie = imdb.get_movie()
 #movie.infoset2keys
 
 # {'main': ['birth info', 'headshot', 'akas', 'filmography', 'in development', 'imdbID', 'name'], 
@@ -61,12 +61,34 @@ for film in nic_films['actor'][0:5]:
         print(f"Title: {film.data['title']}, Year: {film.data['year']}")
     else:
         print(f"Title: {film.data['title']}, Year: N/A")
-        
+
+import csv
+
+actor_names=[]
+tsv_file=open("data.tsv", encoding='utf8')
+read_tsv=csv.reader(tsv_file,delimiter="\t")
+
+for i, row in enumerate(read_tsv):
+    # actor known for: row[5]
+    known_for = row[5].split(',')
+    
+    if i==2:
+        break
+
+tsv_file.close()
+
 import requests
+import re
 from bs4 import BeautifulSoup
 
 actor_awards_page = f"https://www.imdb.com/name/nm{nic_cage.get('imdbID')}/awards?ref_=nm_awd"
 request_page = requests.get(actor_awards_page)
 soup = BeautifulSoup(request_page.text, "html.parser")
-known_for = soup.findAll("")
-print(known_for)
+awards = soup.find_all('table')
+print(len(awards))
+
+awards = soup.find_all('h3')
+print(len(awards))
+
+awards = soup.find_all(re.compile('Winner'))
+print(len(awards))

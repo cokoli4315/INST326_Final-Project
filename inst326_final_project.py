@@ -5,18 +5,15 @@ Assignment: INST326 Final Project
 Date: 4_14_22
 Challenges Encountered: 
 """
-# by Friday, 4/29: have Actor class mostly done, find_actor_name/page mostly done, & publish_comment mostly done
 import csv
-import json
-from nis import match
-from imdb.Person import Person
+import json #not used yet
+from nis import match #not used yet
 from imdb import Cinemagoer
 import datetime
 import praw
-import re
+import re #not used yet
 import requests
 
-# McKenna & Declan
 class Actor:
     """Captures and holds information about an actor using an IMDB page.
     
@@ -29,6 +26,7 @@ class Actor:
         awards (list of strings): 3-5 of the actor's most recent awards
     """
 
+    # McKenna & Chikezie
     def __init__(self, actor_id):
         """Sets the attributes for the Actor.
         
@@ -40,7 +38,7 @@ class Actor:
         """
         imdb = Cinemagoer()
 
-        actor = imdb.get_person('0000115')
+        actor = imdb.get_person(actor_id)
         self.name = actor.get('name')
         
         birthday = actor.get('birth date')
@@ -55,9 +53,10 @@ class Actor:
         
         self.pob = actor.get('birth info')['birth place']
         
-        self.movies = self.get_popular_movies(actor_id)
+        self.works = self.get_popular_movies(actor_id)
         self.awards = self.get_recent_awards(actor_id)
 
+    # McKenna & Declan
     def get_popular_movies(self, actor_id):
         """Gets 3-5 of the most popular movies with the actor.
         
@@ -67,9 +66,20 @@ class Actor:
         Returns:
             works (list of strings): 3-5 of the actor's most popular movies/shows with title & year released
         """
-        # uses data.tsv file since Cinemagoer does not store actor's "Known For" list
-        pass
+        # look thru data.tsv for actor_id ('nm'+str(actor_id)), access row with their info, get last column (col[5]) that has  known for movies
+        # split last col into a list using known_for = row[5].split(','), substring off the "tt" at the beginning of each movie id
+        # use imdb.get_movie(movie_id) to get the Movie object of each movie, add each movie to the works attribute (code below)
+        self.works = []
+
+        for work in known_for:
+            if 'year' in work.data: 
+                self.works.append(f"Title: {work.data['title']}, Year: {work.data['year']}")
+            else:
+                self.works.append(f"Title: {work.data['title']}, Year: N/A")
+                
+        return self.works
     
+    # McKenna & Declan
     def get_recent_awards(self, actor_id):
         """Gets 3-5 of the most recent awards the actor won.
         
@@ -93,9 +103,9 @@ def get_post(post):
     """
     return post.title, post.id
 
-# Chikezie        
+# Chikezie & Surafel    
 def find_actor(post_title):
-    """Looks for an actor's name in the title of a post using regex.
+    """Looks for an actor's name in the title of a post using a csv file.
     
     Args:
         post_title (str): the title of the post being examined
@@ -104,7 +114,7 @@ def find_actor(post_title):
         page_id (int): the IMDB page id of the actor's page taken from find_actor_page
     """
     actor_names=[]
-    tsv_file=open("data.tsv")
+    tsv_file=open("data.tsv", encoding='utf8')
     read_tsv=csv.reader(tsv_file,delimiter="\t")
 
     for row in read_tsv:
@@ -115,12 +125,11 @@ def find_actor(post_title):
     for indv in actor_names:
         if indv in post_title:
             actor_name=indv
-    tsv_file.close()
-        
+    tsv_file.close()     
        
     return actor_name
 
-# Chikezie
+# Chikezie & Surafel
 def find_actor_page(actor_name):
 
     """Looks through IMDB for the actor's page.
@@ -135,7 +144,7 @@ def find_actor_page(actor_name):
     actor_names=[]
     actor_id=[]
     actor_id_name={}
-    tsv_file=open("data.tsv")
+    tsv_file=open("data.tsv", encoding='utf8')
     read_tsv=csv.reader(tsv_file,delimiter="\t")
 
     for row in read_tsv:
@@ -152,7 +161,7 @@ def find_actor_page(actor_name):
 
     return actor_id_name[actor_name]
 
-# Surafel
+# Surafel & McKenna
 def create_comment(actor):
     """Creates a string comment with an Actor object's attributes.
     
@@ -167,7 +176,7 @@ def create_comment(actor):
     # make sure when you print the movies & awards list you are using a loop and printing out each element (for formatting)
     pass
 
-# Surafel
+# Surafel & McKenna
 def publish_comment(post_id, comment):
     """Comments a string to a Reddit post.
     
@@ -177,7 +186,7 @@ def publish_comment(post_id, comment):
     """
     post_id.reply(comment)
 
-# McKenna & Declan
+# Chikenzie & Declan
 def main():
     """Runs the entire program. Calls get_post(), calls find_actor() using title, if a page for the actor is found creates an Actor instance, 
     calls create_comment() using the Actor instance, calls publish_comment() using the return of create_comment()"""
