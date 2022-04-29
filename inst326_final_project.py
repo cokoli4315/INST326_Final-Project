@@ -16,8 +16,6 @@ import praw
 import re
 import requests
 
-
-
 # McKenna & Declan
 class Actor:
     """Captures and holds information about an actor using an IMDB page.
@@ -27,7 +25,7 @@ class Actor:
         age (int): current age of actor
         dob (str): date of birth of actor
         pob (str): place actor was born
-        movies (list of strings): 3-5 of the actor's most popular movies with title & year released
+        works (list of strings): 3-5 of the actor's most popular movies/shows with title & year released
         awards (list of strings): 3-5 of the actor's most recent awards
     """
 
@@ -38,7 +36,7 @@ class Actor:
             actor_id (int): the IMDB id of the actor
             
         Side Effects:
-            Sets name, age, dob, pob, movies, and awards attributes
+            Sets name, age, dob, pob, works, and awards attributes
         """
         imdb = Cinemagoer()
 
@@ -67,8 +65,9 @@ class Actor:
             actor_id (int): the IMDB id of the actor
             
         Returns:
-            movies (list of strings): 3-5 of the actor's most popular movies with title & year released
+            works (list of strings): 3-5 of the actor's most popular movies/shows with title & year released
         """
+        # uses web scraping since Cinemagoer does not store actor's "Known For" list
         pass
     
     def get_recent_awards(self, actor_id):
@@ -80,6 +79,7 @@ class Actor:
         Returns:
             awards (list of strings): 3-5 of the actor's most recent awards 
         """
+        # uses web scraping since Cinemagoer does not store actor's awards
         pass
     
 def get_post(post):
@@ -103,7 +103,6 @@ def find_actor(post_title):
     Returns:
         page_id (int): the IMDB page id of the actor's page taken from find_actor_page
     """
-<<<<<<< HEAD
     actor_names=[]
     tsv_file=open("data.tsv")
     read_tsv=csv.reader(tsv_file,delimiter="\t")
@@ -120,13 +119,6 @@ def find_actor(post_title):
         
        
     return actor_name
-=======
-    # sep title w/ spaces, loop thru title, once a regex match is found call find_actor_page(), 
-    # if find_actor_page() does not find a match continue looking thru the post title for a name until you reach the end
-    # return None if no actor name was found
-    # if an actor is found return page_id (from find_actor_page())
-    pass
->>>>>>> 134596a4626d89f86836efbbdc68ae26d99e863d
 
 # Chikezie
 def find_actor_page(actor_name):
@@ -172,6 +164,7 @@ def create_comment(actor):
     """
     # ex: f"Actor's Name: {actor.name}\n Actor's Age: {actor.age} \n"
     # actor.age calculated in actor class init
+    # make sure when you print the movies & awards list you are using a loop and printing out each element (for formatting)
     pass
 
 # Surafel
@@ -189,16 +182,23 @@ def publish_comment(post_id, comment):
 def main():
     """Runs the entire program. Calls get_post(), calls find_actor() using title, if a page for the actor is found creates an Actor instance, 
     calls create_comment() using the Actor instance, calls publish_comment() using the return of create_comment()"""
-    # gets access to reddit, just an example not in final
+    # gets access to reddit
     reddit = praw.Reddit(
-        client_id="my client id",
-        client_secret="my client secret",
-        user_agent="my user agent",
-        username="my username",
-        password="my password",
+        client_id = "_0kHj0UNHLgsztUOBVIYXg",
+        client_secret = "dgjr6dsvP1CXB_N1jzN5ng08rUQEQw",
+        # fix user_agent
+        user_agent = "<platform>:<app ID>:<version string> (by u/INSTbot)",
+        username = "INSTbot",
+        password = "inst326project",
     )
     
     movies_sub = reddit.subreddit("movies")
+    
+    # for testing, will use specific Reddit posts already identified
+    # put Reddit posts here
+    # test reddit part
+    
+    # will be used in final, not for testing purposes
     for submission in movies_sub.new(limit=10):
         post_title, post_id = get_post(submission)
         actor_page = find_actor(post_title)

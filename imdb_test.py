@@ -53,3 +53,20 @@ print(new_format)
 
 nic_birth = nic_cage.get('birth info')['birth place']
 print(nic_birth)
+
+nic_films = nic_cage.get('filmography') 
+
+for film in nic_films['actor'][0:5]:
+    if 'year' in film.data: 
+        print(f"Title: {film.data['title']}, Year: {film.data['year']}")
+    else:
+        print(f"Title: {film.data['title']}, Year: N/A")
+        
+import requests
+from bs4 import BeautifulSoup
+
+actor_page = f"https://www.imdb.com/name/nm{nic_cage.get('imdbID')}/"
+request_page = requests.get(actor_page)
+soup = BeautifulSoup(request_page.text, "html.parser")
+known_for = soup.findAll("Known For")
+print(known_for)
