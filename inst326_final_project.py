@@ -162,6 +162,23 @@ def create_comment(actor):
     Returns:
         comment (str): hold all the info about the actor parameter
     """
+
+
+    actor_name = f"Actor's Name: {actor.name}"
+    actor_age = f"Actor's Age: {actor.age}"
+    actor_dob = f"Actor's Date of Birth: {actor.dob}"
+    actor_pob = f"Actor's Place of Birth: {actor.pob}"
+
+    actor_works_comment = ""
+    for work in actor.works:
+        actor_works_comment += f"{work}"
+    
+    actor_awards_comment = ""
+    for award in actor.awards:
+        actor_awards_comment += f"{award}"
+    
+    return actor_name + "\n" + actor_age + "\n" + actor_dob + "\n" + actor_pob + "\n" + actor_works_comment + "\n" + actor_awards_comment
+
     # ex: f"Actor's Name: {actor.name}\n Actor's Age: {actor.age} \n"
     # actor.age calculated in actor class init
     # make sure when you print the movies & awards list you are using a loop and printing out each element (for formatting)
