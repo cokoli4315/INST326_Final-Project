@@ -84,11 +84,23 @@ from bs4 import BeautifulSoup
 actor_awards_page = f"https://www.imdb.com/name/nm{nic_cage.get('imdbID')}/awards?ref_=nm_awd"
 request_page = requests.get(actor_awards_page)
 soup = BeautifulSoup(request_page.text, "html.parser")
-awards = soup.find_all('table')
-print(len(awards))
+# fix this so it does not go past awards tables
+all_awards = soup.find_all("tr")
 
-awards = soup.find_all('h3')
-print(len(awards))
-
-awards = soup.find_all(re.compile('Winner'))
+awards_won = []
+for award in all_awards:
+    print(award)
+    award_outcome = award.b.contents[0]
+    if award_outcome == "Winner":
+        awards_won.append(award)
+    
+awards = []
+for award in awards_won:
+    award_html = award.find_all("td")
+    award_year = re.findall(r"> (\d{4})", str(award_html[0].contents[1]))[0]
+    award_category = re.findall(r"\"award_category\">(.*)<", str(award_html[1].contents[4]))[0]
+    award_description = award_html[2].contents[0].lstrip()
+    
+    awards.append(award_year + " " + award_category + " for " + award_description)
+    
 print(len(awards))

@@ -11,8 +11,9 @@ from nis import match #not used yet
 from imdb import Cinemagoer
 import datetime
 import praw
-import re #not used yet
+import re
 import requests
+from bs4 import BeautifulSoup
 
 class Actor:
     """Captures and holds information about an actor using an IMDB page.
@@ -58,7 +59,7 @@ class Actor:
 
     # McKenna & Declan
     def get_popular_movies(self, actor_id):
-        """Gets 3-5 of the most popular movies with the actor.
+        """Gets 3-5 of the most popular movies with the actor using a TSV file.
         
         Args:
             actor_id (int): the IMDB id of the actor
@@ -81,7 +82,7 @@ class Actor:
     
     # McKenna & Declan
     def get_recent_awards(self, actor_id):
-        """Gets 3-5 of the most recent awards the actor won.
+        """Gets 3-5 of the most recent awards the actor won using web scarping.
         
         Args:
             actor_id (int): the IMDB id of the actor
@@ -89,8 +90,29 @@ class Actor:
         Returns:
             awards (list of strings): 3-5 of the actor's most recent awards 
         """
-        # uses web scraping since Cinemagoer does not store actor's awards
-        pass
+        actor_awards_page = f"https://www.imdb.com/name/nm{actor_id}/awards?ref_=nm_awd"
+        request_page = requests.get(actor_awards_page)
+        soup = BeautifulSoup(request_page.text, "html.parser")
+        # fix this so it does not go past awards tables
+        all_awards = soup.find_all("tr")
+
+        awards_won = []
+        for award in all_awards:
+            print(award)
+            award_outcome = award.b.contents[0]
+            if award_outcome == "Winner":
+                awards_won.append(award)
+            
+        self.awards = []
+        for award in awards_won:
+            award_html = award.find_all("td")
+            award_year = re.findall(r"> (\d{4})", str(award_html[0].contents[1]))[0]
+            award_category = re.findall(r"\"award_category\">(.*)<", str(award_html[1].contents[4]))[0]
+            award_description = award_html[2].contents[0].lstrip()
+            
+            self.awards.append(award_year + " " + award_category + " for " + award_description)
+            
+        return self.awards
     
 def get_post(post):
     """Accesses each post in r/movies.
