@@ -162,7 +162,6 @@ def find_actor_page(actor_name):
     Returns: 
         page_id (int): the IMDB page id of the actor's page
     """ 
-    
     actor_names=[]
     actor_id=[]
     actor_id_name={}
@@ -193,8 +192,6 @@ def create_comment(actor):
     Returns:
         comment (str): hold all the info about the actor parameter
     """
-
-
     actor_name = f"Actor's Name: {actor.name}"
     actor_age = f"Actor's Age: {actor.age}"
     actor_dob = f"Actor's Date of Birth: {actor.dob}"
@@ -225,10 +222,18 @@ def publish_comment(post_id, comment):
     """
     post_id.reply(comment)
 
+# Chikezie, & Surafel
+def open_tsv_file():
+    """Opens the TSV file once to be used for other functions.
+    """
+    # work on this more once we've decided where/how we are using data.tsv
+    # might call find_actor & find_actor_page here
+    pass
+
 # Chikenzie & Declan
 def main():
     """Runs the entire program. Calls get_post(), calls find_actor() using title, if a page for the actor is found creates an Actor instance, 
-    calls create_comment() using the Actor instance, calls publish_comment() using the return of create_comment()"""
+    calls create_comment() using the Actor instance, calls publish_comment() using the return of create_comment()."""
     # gets access to reddit
     reddit = praw.Reddit(
         client_id = "_0kHj0UNHLgsztUOBVIYXg",
