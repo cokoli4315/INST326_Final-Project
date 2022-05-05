@@ -14,6 +14,7 @@ import praw
 import re
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
 
 class Actor:
     """Captures and holds information about an actor using an IMDB page.
@@ -72,6 +73,14 @@ class Actor:
         # use imdb.get_movie(movie_id) to get the Movie object of each movie, add each movie to the works attribute (code below)
         self.works = []
 
+        movie_id=[]
+        df = pd.read_csv('data.tsv', sep='\\t', engine='python')
+        popular_movies=df.loc[df['knownforTitles']].values
+        movie_id.append(popular_movies)
+        known_for=
+        movie=imdb.get_movie(movie_id)
+        self.works.append(movie)
+        
         for work in known_for:
             if 'year' in work.data: 
                 self.works.append(f"Title: {work.data['title']}, Year: {work.data['year']}")
@@ -136,8 +145,7 @@ def find_actor(post_title):
         page_id (int): the IMDB page id of the actor's page taken from find_actor_page
     """
     actor_names=[]
-    tsv_file=open("data.tsv", encoding='utf8')
-    read_tsv=csv.reader(tsv_file,delimiter="\t")
+    read_tsv=open_tsv_file("data.tsv")
 
     for row in read_tsv:
         actor_names.append(row[1])
@@ -147,7 +155,7 @@ def find_actor(post_title):
     for indv in actor_names:
         if indv in post_title:
             actor_name=indv
-    tsv_file.close()     
+    read_tsv.close()     
        
     return actor_name
 
@@ -165,9 +173,7 @@ def find_actor_page(actor_name):
     actor_names=[]
     actor_id=[]
     actor_id_name={}
-    tsv_file=open("data.tsv", encoding='utf8')
-    read_tsv=csv.reader(tsv_file,delimiter="\t")
-
+    read_tsv=open_tsv_file("data.tsv")
     for row in read_tsv:
         actor_names.append(row[1])
         actor_id.append(row[0])
@@ -223,7 +229,9 @@ def publish_comment(post_id, comment):
     post_id.reply(comment)
 
 # Chikezie, & Surafel
-def open_tsv_file():
+def open_tsv_file(filename):
+    tsv_file=open(filename, encoding='utf8')
+    read_tsv=csv.reader(tsv_file,delimiter="\t")
     """Opens the TSV file once to be used for other functions.
     """
     # work on this more once we've decided where/how we are using data.tsv
