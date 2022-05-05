@@ -30,7 +30,7 @@ imdb = Cinemagoer()
 if movie.get('title') != "Forrest Gump":
     print('False')"""
     
-# movie = imdb.get_movie()
+"""# movie = imdb.get_movie()
 #movie.infoset2keys
 
 # {'main': ['birth info', 'headshot', 'akas', 'filmography', 'in development', 'imdbID', 'name'], 
@@ -103,4 +103,18 @@ for award in awards_won:
     
     awards.append(award_year + " " + award_category + " for " + award_description)
     
-print(len(awards))
+print(len(awards))"""
+
+import csv
+
+def open_tsv_file(filename):
+    tsv_file=open(filename, encoding='utf8')
+    read_tsv=csv.reader(tsv_file,delimiter="\t")
+    return read_tsv
+
+actor_name = "Nicolas Cage"
+read_tsv=open_tsv_file("data.tsv")
+for row in read_tsv:
+    if row[1] == actor_name:
+        print(row[0])
+        break

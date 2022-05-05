@@ -6,8 +6,6 @@ Date: 4_14_22
 Challenges Encountered: 
 """
 import csv
-import json #not used yet
-from nis import match #not used yet
 from imdb import Cinemagoer
 import datetime
 import praw
@@ -230,13 +228,13 @@ def publish_comment(post_id, comment):
 
 # Chikezie, & Surafel
 def open_tsv_file(filename):
-    tsv_file=open(filename, encoding='utf8')
-    read_tsv=csv.reader(tsv_file,delimiter="\t")
     """Opens the TSV file once to be used for other functions.
     """
     # work on this more once we've decided where/how we are using data.tsv
     # might call find_actor & find_actor_page here
-    pass
+    tsv_file=open(filename, encoding='utf8')
+    read_tsv=csv.reader(tsv_file,delimiter="\t")
+    return read_tsv
 
 # Chikenzie & Declan
 def main():
