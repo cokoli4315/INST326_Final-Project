@@ -107,14 +107,36 @@ print(len(awards))"""
 
 import csv
 
-def open_tsv_file(filename):
+filename = "data.tsv"
+target = 'nm'+"0000115"
+row_num = 0
+
+def open_tsv_file(filename, target, row_num):
+    """Opens the TSV file once to be used for other functions.
+    """
+    # work on this more once we've decided where/how we are using data.tsv
+    # might call find_actor & find_actor_page here
+    # take in str arg called target (can be actor_id or actor_name), opens tsv, goes through file and returns entire row if target is found
     tsv_file=open(filename, encoding='utf8')
     read_tsv=csv.reader(tsv_file,delimiter="\t")
-    return read_tsv
+    for row in read_tsv:
+        if row[row_num] == target:
+            return row
+        
+works = []
+actor_id = "0000115"
+known_for = []
 
-actor_name = "Nicolas Cage"
-read_tsv=open_tsv_file("data.tsv")
-for row in read_tsv:
-    if row[1] == actor_name:
-        print(row[0])
-        break
+target_row = open_tsv_file("data.tsv", 'nm'+actor_id, 0)
+known_for = target_row[5].split(',')
+
+count = 0    
+for film in known_for:
+    movie_code = film[2:]
+    known_for[count] = imdb.get_movie(movie_code)
+    count+=1
+
+for work in known_for:
+    works.append(f"Title: {work.data['title']}, Year: {work.data['year']}")
+    
+print(works)

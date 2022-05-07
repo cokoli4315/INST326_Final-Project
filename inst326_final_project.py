@@ -69,21 +69,22 @@ class Actor:
         # look thru data.tsv for actor_id ('nm'+str(actor_id)), access row with their info, get last column (col[5]) that has  known for movies
         # split last col into a list using known_for = row[5].split(','), substring off the "tt" at the beginning of each movie id
         # use imdb.get_movie(movie_id) to get the Movie object of each movie, add each movie to the works attribute (code below)
-        self.works = []
-
-        movie_id=[]
-        df = pd.read_csv('data.tsv', sep='\\t', engine='python')
-        popular_movies=df.loc[df['knownforTitles']].values
-        movie_id.append(popular_movies)
-        known_for=
-        movie=imdb.get_movie(movie_id)
-        self.works.append(movie)
+        imdb = Cinemagoer()
         
+        self.works = []
+        known_for = []
+
+        target_row = open_tsv_file("data.tsv", 'nm'+actor_id, 0)
+        known_for = target_row[5].split(',')
+
+        count = 0
+        for film in known_for:
+            movie_code = film[2:]
+            known_for[count] = imdb.get_movie(movie_code)
+            count+=1
+
         for work in known_for:
-            if 'year' in work.data: 
-                self.works.append(f"Title: {work.data['title']}, Year: {work.data['year']}")
-            else:
-                self.works.append(f"Title: {work.data['title']}, Year: N/A")
+            self.works.append(f"Title: {work.data['title']}, Year: {work.data['year']}")
                 
         return self.works
     
@@ -227,14 +228,17 @@ def publish_comment(post_id, comment):
     post_id.reply(comment)
 
 # Chikezie, & Surafel
-def open_tsv_file(filename):
+def open_tsv_file(filename, target, row_num):
     """Opens the TSV file once to be used for other functions.
     """
-    # work on this more once we've decided where/how we are using data.tsv
-    # might call find_actor & find_actor_page here
+    # take in str arg called target (can be actor_id or actor_name so it fits for the multiple uses), 
+    # opens tsv, goes through file and returns entire row if target is found
     tsv_file=open(filename, encoding='utf8')
     read_tsv=csv.reader(tsv_file,delimiter="\t")
-    return read_tsv
+    
+    for row in read_tsv:
+        if row[row_num] == target:
+            return row
 
 # Chikenzie & Declan
 def main():
