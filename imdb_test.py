@@ -30,13 +30,13 @@ imdb = Cinemagoer()
 if movie.get('title') != "Forrest Gump":
     print('False')"""
     
-"""# movie = imdb.get_movie()
+# movie = imdb.get_movie()
 #movie.infoset2keys
 
 # {'main': ['birth info', 'headshot', 'akas', 'filmography', 'in development', 'imdbID', 'name'], 
 # 'biography': ['headshot', 'nick names', 'birth name', 'height', 'mini biography', 'trade mark', 'trivia', 'quotes', 'salary history', 'birth date', 'birth notes']}
-nic_cage = imdb.get_person('0000115')
-print(nic_cage.get('name'))
+nic_cage = imdb.get_person('0695435')
+"""print(nic_cage.get('name'))
 nic_birthday = nic_cage.get('birth date') #1964-01-07
 
 birthday_list = nic_birthday.split('-')
@@ -75,7 +75,7 @@ for i, row in enumerate(read_tsv):
     if i==2:
         break
 
-tsv_file.close()
+tsv_file.close()"""
 
 import requests
 import re
@@ -88,22 +88,35 @@ soup = BeautifulSoup(request_page.text, "html.parser")
 all_awards = soup.find_all("tr")
 
 awards_won = []
-for award in all_awards:
-    print(award)
-    award_outcome = award.b.contents[0]
-    if award_outcome == "Winner":
-        awards_won.append(award)
+for count, award in enumerate(all_awards):
+    try:
+        award_outcome = award.b.contents[0]
+        if award_outcome == "Winner":
+            awards_won.append(award)
+        if count > 6:
+            break
+    except AttributeError:
+        continue
     
+print(len(awards_won))
 awards = []
 for award in awards_won:
     award_html = award.find_all("td")
-    award_year = re.findall(r"> (\d{4})", str(award_html[0].contents[1]))[0]
-    award_category = re.findall(r"\"award_category\">(.*)<", str(award_html[1].contents[4]))[0]
-    award_description = award_html[2].contents[0].lstrip()
+
+    award_year = re.findall(r"> (\d{4})", str(award_html[0].contents[1]))
+    if award_year:
+        award_year = award_year[0]
+    award_category = re.findall(r"\"award_category\">(.*)<", str(award_html[1].contents[4]))
+    if award_category:
+        award_category = award_category[0]
+    award_description = ''
+    if len(award_html) > 2:
+        award_description = award_html[2].contents[0].lstrip()
     
-    awards.append(award_year + " " + award_category + " for " + award_description)
+    if award_year and award_category and award_description:
+        awards.append(str(award_year) + " " + str(award_category) + " for " + str(award_description))
     
-print(len(awards))"""
+print(awards)
 
 """import csv
 
@@ -140,7 +153,7 @@ for work in known_for:
     
 print(works)"""
 
-post_title = 'What are some non-American actors who suck at doing American accent?'
+"""post_title = 'What are some non-American actors who suck at doing American accent?'
 title = post_title.split(' ')
 title_list = []
 
@@ -151,4 +164,8 @@ for count, word in enumerate(title[1:]):
     else:
         title_list.append(title[count] + ' ' + word)
         
-print(title_list)
+print(title_list)"""
+
+from prompt_toolkit import print_formatted_text, HTML
+actor_works_comment = str(HTML("\n<b>Popular Works:</b>"))
+print(actor_works_comment)

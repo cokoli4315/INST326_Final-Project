@@ -12,7 +12,8 @@ import praw
 import re
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
+import string
+import pandas as pd #not used
 
 class Actor:
     """Captures and holds information about an actor using an IMDB page.
@@ -25,7 +26,6 @@ class Actor:
         works (list of strings): 3-5 of the actor's most popular movies/shows with title & year released
         awards (list of strings): 3-5 of the actor's most recent awards
     """
-
     # McKenna & Chikezie
     def __init__(self, actor_id):
         """Sets the attributes for the Actor.
@@ -42,16 +42,21 @@ class Actor:
         self.name = actor.get('name')
         
         birthday = actor.get('birth date')
-        birthday_list = birthday.split('-')
         
-        today = datetime.date.today()
-        birthdate = datetime.date(int(birthday_list[0]), int(birthday_list[1]), int(birthday_list[2]))
-        self.age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+        if birthday:
+            birthday_list = birthday.split('-')
         
-        datetime_birthday = datetime.datetime.strptime(birthday, '%Y-%m-%d')
-        self.dob = datetime_birthday.strftime('%B %d, %Y')
+            today = datetime.date.today()
+            birthdate = datetime.date(int(birthday_list[0]), int(birthday_list[1]), int(birthday_list[2]))
+            self.age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
         
-        self.pob = actor.get('birth info')['birth place']
+            datetime_birthday = datetime.datetime.strptime(birthday, '%Y-%m-%d')
+            self.dob = datetime_birthday.strftime('%B %d, %Y')
+        
+        try:
+            self.pob = actor.get('birth info')['birth place']
+        except TypeError:
+            self.pob = 'Could not find one'
         
         self.works = self.get_popular_movies(actor_id)
         self.awards = self.get_recent_awards(actor_id)
@@ -90,7 +95,7 @@ class Actor:
     
     # McKenna & Declan
     def get_recent_awards(self, actor_id):
-        """Gets 3-5 of the most recent awards the actor won using web scarping.
+        """Gets 3-5 of the most recent awards the actor won using web scraping.
         
         Args:
             actor_id (int): the IMDB id of the actor
@@ -98,32 +103,42 @@ class Actor:
         Returns:
             awards (list of strings): 3-5 of the actor's most recent awards 
         """
-        #get this working (only for top 4 awards?)
-        try:
-            actor_awards_page = f"https://www.imdb.com/name/nm{actor_id}/awards?ref_=nm_awd"
-            request_page = requests.get(actor_awards_page)
-            soup = BeautifulSoup(request_page.text, "html.parser")
-            # fix this so it does not go past awards tables
-            all_awards = soup.find_all("tr")
+        actor_awards_page = f"https://www.imdb.com/name/nm{actor_id}/awards?ref_=nm_awd"
+        request_page = requests.get(actor_awards_page)
+        soup = BeautifulSoup(request_page.text, "html.parser")
+        all_awards = soup.find_all("tr")
 
-            awards_won = []
-            for award in all_awards:
+        awards_won = []
+        for count, award in enumerate(all_awards):
+            try:
                 award_outcome = award.b.contents[0]
                 if award_outcome == "Winner":
                     awards_won.append(award)
-                
-            self.awards = []
-            for award in awards_won:
-                award_html = award.find_all("td")
-                award_year = re.findall(r"> (\d{4})", str(award_html[0].contents[1]))[0]
-                award_category = re.findall(r"\"award_category\">(.*)<", str(award_html[1].contents[4]))[0]
+                if count > 10:
+                    break
+            except AttributeError:
+                continue
+        
+        self.awards = []
+        for award in awards_won:
+            award_html = award.find_all("td")
+
+            award_year = re.findall(r"> (\d{4})", str(award_html[0].contents[1]))
+            if award_year:
+                award_year = award_year[0]
+            
+            award_category = re.findall(r"\"award_category\">(.*)<", str(award_html[1].contents[4]))
+            if award_category:
+                award_category = award_category[0]
+            
+            award_description = ''
+            if len(award_html) > 2:
                 award_description = award_html[2].contents[0].lstrip()
-                
-                self.awards.append(award_year + " " + award_category + " for " + award_description)
-                
-            return self.awards
-        except AttributeError:
-            return ["Could not find any"]
+            
+            if award_year and award_category and award_description:
+                self.awards.append(str(award_year) + " " + str(award_category) + " for " + str(award_description))
+        
+        return self.awards
     
 def get_post(post):
     """Accesses each post in r/movies.
@@ -146,12 +161,12 @@ def find_actor(post_title, actor_names):
     Returns:
         page_id (int): the IMDB page id of the actor's page taken from find_actor_page
     """
-    #get rid of punctuation in title
     title = post_title.split(' ')
     title_list = []
 
     first_word = title[0]
     for count, word in enumerate(title[1:]):
+        word = word.translate(str.maketrans('', '', string.punctuation))
         if count == 0:
             title_list.append(first_word + ' ' + word)
         else:
@@ -163,7 +178,6 @@ def find_actor(post_title, actor_names):
             actor_name = actor
     
     if actor_name != '':
-        print(actor_name)
         return find_actor_page(actor_name)
     
     return None
@@ -182,8 +196,11 @@ def find_actor_page(actor_name):
     target_row = open_tsv_file(actor_name, 1)
     
     if target_row != None:
-        page_id = target_row[0]
-        return page_id[2:]
+        profession = target_row[4].split(',')
+    
+        if ('actor' in profession or 'actress' in profession) and target_row[2] != '\\N':
+            page_id = target_row[0]
+            return page_id[2:]
     
     return None
     """actor_names=[]
@@ -214,36 +231,40 @@ def create_comment(actor):
     Returns:
         comment (str): hold all the info about the actor parameter
     """
-    # add new lines & bolding
-    actor_name = f"Actor's Name: {actor.name}"
-    actor_age = f"Actor's Age: {actor.age}"
-    actor_dob = f"Actor's Date of Birth: {actor.dob}"
-    actor_pob = f"Actor's Place of Birth: {actor.pob}"
+    actor_name = f"""**Actor's Name:** {actor.name}  
+    """
+    actor_age = f"""**Actor's Age:** {actor.age}  
+    """
+    actor_dob = f"""**Actor's Date of Birth:** {actor.dob}  
+    """
+    actor_pob = f"""**Actor's Place of Birth:** {actor.pob}  
+    """
 
-    actor_works_comment = "Popular Works: "
+    actor_works_comment = "**Popular Works:**"
     for count, work in enumerate(actor.works):
-        actor_works_comment += f"{count+1}. {work} "
+        actor_works_comment += f"""     
+        {count+1}. {work}"""
     
-    actor_awards_comment = "Awards Won: "
-    for count, award in enumerate(actor.awards):
-        actor_awards_comment += f"{count+1}. {award} "
+    actor_awards_comment = """
+    **Awards Won:**"""
+    if actor.awards:
+        for count, award in enumerate(actor.awards):
+            actor_awards_comment += f"""     
+            {count+1}. {award}"""
+    else:
+        actor_awards_comment += 'Could not find any'
     
-    return actor_name + "\n" + actor_age + "\n" + actor_dob + "\n" + actor_pob + "\n" + actor_works_comment + "\n" + actor_awards_comment
-
-    # ex: f"Actor's Name: {actor.name}\n Actor's Age: {actor.age} \n"
-    # actor.age calculated in actor class init
-    # make sure when you print the movies & awards list you are using a loop and printing out each element (for formatting)
-    pass
+    return actor_name + actor_age + actor_dob + actor_pob + actor_works_comment + actor_awards_comment
 
 # Surafel & McKenna
-def publish_comment(post_id, comment):
+def publish_comment(post, comment):
     """Comments a string to a Reddit post.
     
     Args:
         post_id (int): the ID of the post that has the actor's name in it
         comment (str): the comment that will be published to the post"""
     
-    post_id.reply(comment)
+    post.reply(comment)
 
 # Chikezie, & Surafel
 def open_tsv_file(target, row_num):
@@ -289,21 +310,20 @@ def main():
     movies_sub = reddit.subreddit("movies")
     
     # format output a little better
-    for submission in movies_sub.new(limit=10):
+    for count, submission in enumerate(movies_sub.new(limit=5)):
         post_title, post_id = get_post(submission)
-        print(f"Title: {post_title}, ID: {post_id}")
+        print(f"\n\033[1mPost #{count+1} Title:\033[0m \"{post_title}\" \t \033[1mPost ID:\033[0m {post_id}")
         actor_page = find_actor(post_title, actor_names)
-        print(f"Actor page ID: {actor_page}")
+        print(f"\033[1mActor IMDB Page ID:\033[0m {actor_page}")
         
         # is imdb page ID & actor ID the same?
         if actor_page != None:
-            print('found actor')
             actor = Actor(actor_page)
             
             comment = create_comment(actor)
-            print(comment)
-            #publish_comment(post_id, comment)
-            #print('Published comment!')
+            print('\n\033[1mPost Comment:\033[0m \n' + comment)
+            publish_comment(submission, comment)
+            print('\nPublished comment! Check Reddit post for comment.')
 
 if __name__ == "__main__":
     # calls main to run program
