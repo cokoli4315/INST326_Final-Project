@@ -105,15 +105,14 @@ for award in awards_won:
     
 print(len(awards))"""
 
-import csv
+"""import csv
 
 filename = "data.tsv"
 target = 'nm'+"0000115"
 row_num = 0
 
 def open_tsv_file(filename, target, row_num):
-    """Opens the TSV file once to be used for other functions.
-    """
+    Opens the TSV file once to be used for other functions.
     # work on this more once we've decided where/how we are using data.tsv
     # might call find_actor & find_actor_page here
     # take in str arg called target (can be actor_id or actor_name), opens tsv, goes through file and returns entire row if target is found
@@ -139,4 +138,17 @@ for film in known_for:
 for work in known_for:
     works.append(f"Title: {work.data['title']}, Year: {work.data['year']}")
     
-print(works)
+print(works)"""
+
+post_title = 'What are some non-American actors who suck at doing American accent?'
+title = post_title.split(' ')
+title_list = []
+
+first_word = title[0]
+for count, word in enumerate(title[1:]):
+    if count == 0:
+        title_list.append(first_word + ' ' + word)
+    else:
+        title_list.append(title[count] + ' ' + word)
+        
+print(title_list)

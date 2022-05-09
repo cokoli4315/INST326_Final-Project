@@ -74,7 +74,7 @@ class Actor:
         self.works = []
         known_for = []
 
-        target_row = open_tsv_file("data.tsv", 'nm'+actor_id, 0)
+        target_row = open_tsv_file('nm'+actor_id, 0)
         known_for = target_row[5].split(',')
 
         count = 0
@@ -98,29 +98,32 @@ class Actor:
         Returns:
             awards (list of strings): 3-5 of the actor's most recent awards 
         """
-        actor_awards_page = f"https://www.imdb.com/name/nm{actor_id}/awards?ref_=nm_awd"
-        request_page = requests.get(actor_awards_page)
-        soup = BeautifulSoup(request_page.text, "html.parser")
-        # fix this so it does not go past awards tables
-        all_awards = soup.find_all("tr")
+        #get this working (only for top 4 awards?)
+        try:
+            actor_awards_page = f"https://www.imdb.com/name/nm{actor_id}/awards?ref_=nm_awd"
+            request_page = requests.get(actor_awards_page)
+            soup = BeautifulSoup(request_page.text, "html.parser")
+            # fix this so it does not go past awards tables
+            all_awards = soup.find_all("tr")
 
-        awards_won = []
-        for award in all_awards:
-            print(award)
-            award_outcome = award.b.contents[0]
-            if award_outcome == "Winner":
-                awards_won.append(award)
-            
-        self.awards = []
-        for award in awards_won:
-            award_html = award.find_all("td")
-            award_year = re.findall(r"> (\d{4})", str(award_html[0].contents[1]))[0]
-            award_category = re.findall(r"\"award_category\">(.*)<", str(award_html[1].contents[4]))[0]
-            award_description = award_html[2].contents[0].lstrip()
-            
-            self.awards.append(award_year + " " + award_category + " for " + award_description)
-            
-        return self.awards
+            awards_won = []
+            for award in all_awards:
+                award_outcome = award.b.contents[0]
+                if award_outcome == "Winner":
+                    awards_won.append(award)
+                
+            self.awards = []
+            for award in awards_won:
+                award_html = award.find_all("td")
+                award_year = re.findall(r"> (\d{4})", str(award_html[0].contents[1]))[0]
+                award_category = re.findall(r"\"award_category\">(.*)<", str(award_html[1].contents[4]))[0]
+                award_description = award_html[2].contents[0].lstrip()
+                
+                self.awards.append(award_year + " " + award_category + " for " + award_description)
+                
+            return self.awards
+        except AttributeError:
+            return ["Could not find any"]
     
 def get_post(post):
     """Accesses each post in r/movies.
@@ -134,7 +137,7 @@ def get_post(post):
     return post.title, post.id
 
 # Chikezie & Surafel    
-def find_actor(post_title):
+def find_actor(post_title, actor_names):
     """Looks for an actor's name in the title of a post using a csv file.
     
     Args:
@@ -143,20 +146,27 @@ def find_actor(post_title):
     Returns:
         page_id (int): the IMDB page id of the actor's page taken from find_actor_page
     """
-    actor_names=[]
-    read_tsv=open_tsv_file("data.tsv")
+    #get rid of punctuation in title
+    title = post_title.split(' ')
+    title_list = []
 
-    for row in read_tsv:
-        actor_names.append(row[1])
-
-    print(actor_names[1])
-
-    for indv in actor_names:
-        if indv in post_title:
-            actor_name=indv
-    read_tsv.close()     
-       
-    return actor_name
+    first_word = title[0]
+    for count, word in enumerate(title[1:]):
+        if count == 0:
+            title_list.append(first_word + ' ' + word)
+        else:
+            title_list.append(title[count] + ' ' + word)
+    
+    actor_name = ''
+    for actor in actor_names:
+        if actor in [words for words in title_list]:
+            actor_name = actor
+    
+    if actor_name != '':
+        print(actor_name)
+        return find_actor_page(actor_name)
+    
+    return None
 
 # Chikezie & Surafel
 def find_actor_page(actor_name):
@@ -169,7 +179,14 @@ def find_actor_page(actor_name):
     Returns: 
         page_id (int): the IMDB page id of the actor's page
     """ 
-    actor_names=[]
+    target_row = open_tsv_file(actor_name, 1)
+    
+    if target_row != None:
+        page_id = target_row[0]
+        return page_id[2:]
+    
+    return None
+    """actor_names=[]
     actor_id=[]
     actor_id_name={}
     read_tsv=open_tsv_file("data.tsv")
@@ -185,7 +202,7 @@ def find_actor_page(actor_name):
 
     url=f"https://imdb-api.com/API/Name/k_gwul40q2/{actor_id_name[actor_name]}"
 
-    return actor_id_name[actor_name]
+    return actor_id_name[actor_name]"""
 
 # Surafel & McKenna
 def create_comment(actor):
@@ -197,18 +214,19 @@ def create_comment(actor):
     Returns:
         comment (str): hold all the info about the actor parameter
     """
+    # add new lines & bolding
     actor_name = f"Actor's Name: {actor.name}"
     actor_age = f"Actor's Age: {actor.age}"
     actor_dob = f"Actor's Date of Birth: {actor.dob}"
     actor_pob = f"Actor's Place of Birth: {actor.pob}"
 
-    actor_works_comment = ""
-    for work in actor.works:
-        actor_works_comment += f"{work}"
+    actor_works_comment = "Popular Works: "
+    for count, work in enumerate(actor.works):
+        actor_works_comment += f"{count+1}. {work} "
     
-    actor_awards_comment = ""
-    for award in actor.awards:
-        actor_awards_comment += f"{award}"
+    actor_awards_comment = "Awards Won: "
+    for count, award in enumerate(actor.awards):
+        actor_awards_comment += f"{count+1}. {award} "
     
     return actor_name + "\n" + actor_age + "\n" + actor_dob + "\n" + actor_pob + "\n" + actor_works_comment + "\n" + actor_awards_comment
 
@@ -223,22 +241,35 @@ def publish_comment(post_id, comment):
     
     Args:
         post_id (int): the ID of the post that has the actor's name in it
-        comment (str): the comment that will be published to the post
-    """
+        comment (str): the comment that will be published to the post"""
+    
     post_id.reply(comment)
 
 # Chikezie, & Surafel
-def open_tsv_file(filename, target, row_num):
+def open_tsv_file(target, row_num):
     """Opens the TSV file once to be used for other functions.
     """
     # take in str arg called target (can be actor_id or actor_name so it fits for the multiple uses), 
     # opens tsv, goes through file and returns entire row if target is found
-    tsv_file=open(filename, encoding='utf8')
+    tsv_file=open('data.tsv', encoding='utf8')
     read_tsv=csv.reader(tsv_file,delimiter="\t")
     
     for row in read_tsv:
         if row[row_num] == target:
             return row
+        
+def imdb_actor_names():
+    actor_names=[]
+    
+    file = open("data.tsv", encoding='utf8')
+    read_tsv = csv.reader(file,delimiter="\t")
+    
+    for row in read_tsv:
+        actor_names.append(row[1])
+    
+    file.close()
+    
+    return actor_names
 
 # Chikenzie & Declan
 def main():
@@ -254,23 +285,25 @@ def main():
         password = "inst326project",
     )
     
+    actor_names = imdb_actor_names()
     movies_sub = reddit.subreddit("movies")
     
-    # for testing, will use specific Reddit posts already identified
-    # put Reddit posts here
-    # test reddit part
-    
-    # will be used in final, not for testing purposes
+    # format output a little better
     for submission in movies_sub.new(limit=10):
         post_title, post_id = get_post(submission)
-        actor_page = find_actor(post_title)
+        print(f"Title: {post_title}, ID: {post_id}")
+        actor_page = find_actor(post_title, actor_names)
+        print(f"Actor page ID: {actor_page}")
         
         # is imdb page ID & actor ID the same?
         if actor_page != None:
+            print('found actor')
             actor = Actor(actor_page)
             
             comment = create_comment(actor)
-            publish_comment(post_id, comment)
+            print(comment)
+            #publish_comment(post_id, comment)
+            #print('Published comment!')
 
 if __name__ == "__main__":
     # calls main to run program
