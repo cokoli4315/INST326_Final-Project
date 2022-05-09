@@ -240,19 +240,19 @@ def create_comment(actor):
     actor_pob = f"""**Actor's Place of Birth:** {actor.pob}  
     """
 
-    actor_works_comment = "**Popular Works:**"
+    actor_works_comment = """**Popular Works:**
+    """
     for count, work in enumerate(actor.works):
-        actor_works_comment += f"""     
-        {count+1}. {work}"""
+        actor_works_comment += f"""{count+1}. {work}
+        """
     
-    actor_awards_comment = """
-    **Awards Won:**"""
+    actor_awards_comment = """**Awards Won:**"""
     if actor.awards:
         for count, award in enumerate(actor.awards):
-            actor_awards_comment += f"""     
-            {count+1}. {award}"""
+            actor_awards_comment += f"""{count+1}. {award}
+            """
     else:
-        actor_awards_comment += 'Could not find any'
+        actor_awards_comment += """Could not find any"""
     
     return actor_name + actor_age + actor_dob + actor_pob + actor_works_comment + actor_awards_comment
 
@@ -309,14 +309,12 @@ def main():
     actor_names = imdb_actor_names()
     movies_sub = reddit.subreddit("movies")
     
-    # format output a little better
     for count, submission in enumerate(movies_sub.new(limit=5)):
         post_title, post_id = get_post(submission)
         print(f"\n\033[1mPost #{count+1} Title:\033[0m \"{post_title}\" \t \033[1mPost ID:\033[0m {post_id}")
         actor_page = find_actor(post_title, actor_names)
         print(f"\033[1mActor IMDB Page ID:\033[0m {actor_page}")
-        
-        # is imdb page ID & actor ID the same?
+   
         if actor_page != None:
             actor = Actor(actor_page)
             
