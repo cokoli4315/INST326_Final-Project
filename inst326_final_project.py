@@ -319,7 +319,7 @@ def main():
     actor_names = get_imdb_actor_names()
     movies_sub = reddit.subreddit("movies")
     
-    for count, submission in enumerate(movies_sub.new(limit=15)):
+    for count, submission in enumerate(movies_sub.new(limit=10)):
         post_title, post_id = get_post(submission)
         print(f"\n\033[1mPost #{count+1} Title:\033[0m \"{post_title}\" \t \033[1mPost ID:\033[0m {post_id}")
         actor_page = find_actor(post_title, actor_names)

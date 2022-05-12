@@ -35,7 +35,7 @@ if movie.get('title') != "Forrest Gump":
 
 # {'main': ['birth info', 'headshot', 'akas', 'filmography', 'in development', 'imdbID', 'name'], 
 # 'biography': ['headshot', 'nick names', 'birth name', 'height', 'mini biography', 'trade mark', 'trivia', 'quotes', 'salary history', 'birth date', 'birth notes']}
-nic_cage = imdb.get_person('0000129')
+nic_cage = imdb.get_person('0000343')
 """print(nic_cage.get('name'))
 nic_birthday = nic_cage.get('birth date') #1964-01-07
 
@@ -95,8 +95,9 @@ for count, award in enumerate(all_awards):
             awards_won.append(award)
     except AttributeError:
         continue
-    
-print(len(awards_won))
+
+for i in range(1):
+    print(awards_won)
 awards = []
 for count, award in enumerate(awards_won):
     award_html = award.find_all("td")
@@ -179,7 +180,7 @@ if word[-2:] == "'s":
 print(word)"""
 
 
-actor = imdb.get_person('0000129')
+"""actor = imdb.get_person('0000129')
 print(actor.get('death date'))
 actor = imdb.get_person('0000054')
-print(actor.get('death date'))
+print(actor.get('death date'))"""
