@@ -1,9 +1,10 @@
-"""A program that looks through posts on the subreddit r/movies and comments information about an actor if they are mentioned.
+"""A program that looks through posts on the subreddit r/movies and comments information about an actor if they are mentioned in the post title.
 
 Group Members: McKenna Shay, Declan Dmitriev, Chikezie Okoli, Surafel Assres
 Assignment: INST326 Final Project
 Date: 4_14_22
-Challenges Encountered: 
+Challenges Encountered: learning about the APIs we are using, figuring out how to find an actor's name in a title, 
+getting an actor's most popular movies (stored in their "known for" list of IMDB), getting awards won by an actor
 """
 import csv
 from imdb import Cinemagoer
@@ -18,12 +19,12 @@ class Actor:
     """Captures and holds information about an actor using an IMDB page.
     
     Attributes:
-        name (str): full name of  actor
-        age (int): current age of actor
+        name (str): full name of actor
+        age (int/str): current age of actor or age at passing if actor has died (as a str)
         dob (str): date of birth of actor
         pob (str): place actor was born
-        works (list of strings): 3-5 of the actor's most popular movies/shows with title & year released
-        awards (list of strings): 3-5 of the actor's most recent awards
+        works (list of strings): 4 of the actor's most popular movies/shows with title & year released
+        awards (list of strings): 3-5 of some of the awards the actor has won
     """
     # McKenna & Chikezie
     def __init__(self, actor_id):
@@ -41,16 +42,23 @@ class Actor:
         self.name = actor.get('name')
         
         birthday = actor.get('birth date')
+            
+        birthday_list = birthday.split('-')
+        birthdate = datetime.date(int(birthday_list[0]), int(birthday_list[1]), int(birthday_list[2]))
         
-        if birthday:
-            birthday_list = birthday.split('-')
+        deathday = actor.get('death date')
+        if deathday:
+            death_date_list = deathday.split('-')
+            death_date = datetime.date(int(death_date_list[0]), int(death_date_list[1]), int(death_date_list[2]))
         
+            self.age = death_date.year - birthdate.year - ((death_date.month, death_date.day) < (birthdate.month, birthdate.day))
+            self.age = str(self.age) + " (at passing)"
+        else:
             today = datetime.date.today()
-            birthdate = datetime.date(int(birthday_list[0]), int(birthday_list[1]), int(birthday_list[2]))
             self.age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
-        
-            datetime_birthday = datetime.datetime.strptime(birthday, '%Y-%m-%d')
-            self.dob = datetime_birthday.strftime('%B %d, %Y')
+    
+        datetime_birthday = datetime.datetime.strptime(birthday, '%Y-%m-%d')
+        self.dob = datetime_birthday.strftime('%B %d, %Y')
         
         try:
             self.pob = actor.get('birth info')['birth place']
@@ -58,7 +66,7 @@ class Actor:
             self.pob = 'Could not find one'
         
         self.works = self.get_popular_movies(actor_id)
-        self.awards = self.get_recent_awards(actor_id)
+        self.awards = self.get_actor_awards(actor_id)
 
     # McKenna & Declan
     def get_popular_movies(self, actor_id):
@@ -88,12 +96,12 @@ class Actor:
             count+=1
 
         for work in known_for:
-            self.works.append(f"Title: {work.data['title']}, Year: {work.data['year']}")
+            self.works.append(f"{work.data['title']} ({work.data['year']})")
                 
         return self.works
     
     # McKenna & Declan
-    def get_recent_awards(self, actor_id):
+    def get_actor_awards(self, actor_id):
         """Gets 3-5 of the most recent awards the actor won using web scraping.
         
         Args:
@@ -113,15 +121,13 @@ class Actor:
                 award_outcome = award.b.contents[0]
                 if award_outcome == "Winner":
                     awards_won.append(award)
-                if count > 15:
-                    break
             except AttributeError:
                 continue
             except IndexError:
                 break
         
         self.awards = []
-        for award in awards_won:
+        for count, award in enumerate(awards_won):
             award_html = award.find_all("td")
 
             award_year = re.findall(r"> (\d{4})", str(award_html[0].contents[1]))
@@ -138,6 +144,9 @@ class Actor:
             
             if award_year and award_category and award_description:
                 self.awards.append(str(award_year) + " " + str(award_category) + " for " + str(award_description))
+                
+            if count > 3:
+                break
         
         return self.awards
     
@@ -178,13 +187,20 @@ def find_actor(post_title, actor_names):
             title_pairs.append(title[count] + ' ' + word)
     
     actor_name = ''
+    actor_page = ''
+    
     for title_pair in title_pairs:
         if title_pair in actor_names:
             actor_name = title_pair
-            break
+            actor_page = find_actor_page(actor_name)
+            
+            if actor_page != None:
+                break
+            
+            actor_name = ''
     
     if actor_name != '':
-        return find_actor_page(actor_name)
+        return actor_page
     
     return None
 
@@ -230,7 +246,7 @@ def create_comment(actor, actor_id):
         actor_works_comment += f"""    
             {count+1}. {work}"""
     
-    actor_awards_comment = "**Awards Won:**    "
+    actor_awards_comment = "**Some Awards Won:**    "
     if actor.awards:
         for count, award in enumerate(actor.awards):
             actor_awards_comment += f"""    
@@ -238,7 +254,8 @@ def create_comment(actor, actor_id):
     else:
         actor_awards_comment += " Could not find any    "
         
-    mistakes_message = f"Sometimes mistakes are made, click [here](https://www.imdb.com/name/nm{actor_id}/) to learn more about this actor!"
+    mistakes_message = f"""This bot gives information about the first actor mentioned in a post title on r/movies, but sometimes mistakes are made. 
+Click [here](https://www.imdb.com/name/nm{actor_id}/) to learn more about the actor found for this post!"""
     
     return (actor_name + """ 
 """ + actor_age + """ 
@@ -302,7 +319,7 @@ def main():
     actor_names = get_imdb_actor_names()
     movies_sub = reddit.subreddit("movies")
     
-    for count, submission in enumerate(movies_sub.new(limit=10)):
+    for count, submission in enumerate(movies_sub.new(limit=15)):
         post_title, post_id = get_post(submission)
         print(f"\n\033[1mPost #{count+1} Title:\033[0m \"{post_title}\" \t \033[1mPost ID:\033[0m {post_id}")
         actor_page = find_actor(post_title, actor_names)

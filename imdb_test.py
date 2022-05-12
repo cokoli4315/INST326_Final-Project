@@ -35,7 +35,7 @@ if movie.get('title') != "Forrest Gump":
 
 # {'main': ['birth info', 'headshot', 'akas', 'filmography', 'in development', 'imdbID', 'name'], 
 # 'biography': ['headshot', 'nick names', 'birth name', 'height', 'mini biography', 'trade mark', 'trivia', 'quotes', 'salary history', 'birth date', 'birth notes']}
-nic_cage = imdb.get_person('0695435')
+nic_cage = imdb.get_person('0000129')
 """print(nic_cage.get('name'))
 nic_birthday = nic_cage.get('birth date') #1964-01-07
 
@@ -93,14 +93,12 @@ for count, award in enumerate(all_awards):
         award_outcome = award.b.contents[0]
         if award_outcome == "Winner":
             awards_won.append(award)
-        if count > 6:
-            break
     except AttributeError:
         continue
     
 print(len(awards_won))
 awards = []
-for award in awards_won:
+for count, award in enumerate(awards_won):
     award_html = award.find_all("td")
 
     award_year = re.findall(r"> (\d{4})", str(award_html[0].contents[1]))
@@ -115,6 +113,9 @@ for award in awards_won:
     
     if award_year and award_category and award_description:
         awards.append(str(award_year) + " " + str(award_category) + " for " + str(award_description))
+      
+    if count > 3:
+        break  
     
 print(awards)
 
@@ -166,7 +167,7 @@ for count, word in enumerate(title[1:]):
         
 print(title_list)"""
 
-from prompt_toolkit import print_formatted_text, HTML
+"""from prompt_toolkit import print_formatted_text, HTML
 actor_works_comment = str(HTML("\n<b>Popular Works:</b>"))
 print(actor_works_comment)
 
@@ -175,4 +176,10 @@ word = "Zack Snyder's"
 if word[-2:] == "'s":
     word = word[0:-2]
     
-print(word)
+print(word)"""
+
+
+actor = imdb.get_person('0000129')
+print(actor.get('death date'))
+actor = imdb.get_person('0000054')
+print(actor.get('death date'))
