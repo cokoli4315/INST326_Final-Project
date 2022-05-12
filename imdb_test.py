@@ -169,3 +169,10 @@ print(title_list)"""
 from prompt_toolkit import print_formatted_text, HTML
 actor_works_comment = str(HTML("\n<b>Popular Works:</b>"))
 print(actor_works_comment)
+
+word = "Zack Snyder's"
+
+if word[-2:] == "'s":
+    word = word[0:-2]
+    
+print(word)
