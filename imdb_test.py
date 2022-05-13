@@ -35,8 +35,8 @@ if movie.get('title') != "Forrest Gump":
 
 # {'main': ['birth info', 'headshot', 'akas', 'filmography', 'in development', 'imdbID', 'name'], 
 # 'biography': ['headshot', 'nick names', 'birth name', 'height', 'mini biography', 'trade mark', 'trivia', 'quotes', 'salary history', 'birth date', 'birth notes']}
-nic_cage = imdb.get_person('0000115')
-print(nic_cage.get('name'))
+nic_cage = imdb.get_person('0000343')
+"""print(nic_cage.get('name'))
 nic_birthday = nic_cage.get('birth date') #1964-01-07
 
 birthday_list = nic_birthday.split('-')
@@ -75,7 +75,7 @@ for i, row in enumerate(read_tsv):
     if i==2:
         break
 
-tsv_file.close()
+tsv_file.close()"""
 
 import requests
 import re
@@ -88,19 +88,99 @@ soup = BeautifulSoup(request_page.text, "html.parser")
 all_awards = soup.find_all("tr")
 
 awards_won = []
-for award in all_awards:
-    print(award)
-    award_outcome = award.b.contents[0]
-    if award_outcome == "Winner":
-        awards_won.append(award)
-    
+for count, award in enumerate(all_awards):
+    try:
+        award_outcome = award.b.contents[0]
+        if award_outcome == "Winner":
+            awards_won.append(award)
+    except AttributeError:
+        continue
+
+for i in range(1):
+    print(awards_won)
 awards = []
-for award in awards_won:
+for count, award in enumerate(awards_won):
     award_html = award.find_all("td")
-    award_year = re.findall(r"> (\d{4})", str(award_html[0].contents[1]))[0]
-    award_category = re.findall(r"\"award_category\">(.*)<", str(award_html[1].contents[4]))[0]
-    award_description = award_html[2].contents[0].lstrip()
+
+    award_year = re.findall(r"> (\d{4})", str(award_html[0].contents[1]))
+    if award_year:
+        award_year = award_year[0]
+    award_category = re.findall(r"\"award_category\">(.*)<", str(award_html[1].contents[4]))
+    if award_category:
+        award_category = award_category[0]
+    award_description = ''
+    if len(award_html) > 2:
+        award_description = award_html[2].contents[0].lstrip()
     
-    awards.append(award_year + " " + award_category + " for " + award_description)
+    if award_year and award_category and award_description:
+        awards.append(str(award_year) + " " + str(award_category) + " for " + str(award_description))
+      
+    if count > 3:
+        break  
     
-print(len(awards))
+print(awards)
+
+"""import csv
+
+filename = "data.tsv"
+target = 'nm'+"0000115"
+row_num = 0
+
+def open_tsv_file(filename, target, row_num):
+    Opens the TSV file once to be used for other functions.
+    # work on this more once we've decided where/how we are using data.tsv
+    # might call find_actor & find_actor_page here
+    # take in str arg called target (can be actor_id or actor_name), opens tsv, goes through file and returns entire row if target is found
+    tsv_file=open(filename, encoding='utf8')
+    read_tsv=csv.reader(tsv_file,delimiter="\t")
+    for row in read_tsv:
+        if row[row_num] == target:
+            return row
+        
+works = []
+actor_id = "0000115"
+known_for = []
+
+target_row = open_tsv_file("data.tsv", 'nm'+actor_id, 0)
+known_for = target_row[5].split(',')
+
+count = 0    
+for film in known_for:
+    movie_code = film[2:]
+    known_for[count] = imdb.get_movie(movie_code)
+    count+=1
+
+for work in known_for:
+    works.append(f"Title: {work.data['title']}, Year: {work.data['year']}")
+    
+print(works)"""
+
+"""post_title = 'What are some non-American actors who suck at doing American accent?'
+title = post_title.split(' ')
+title_list = []
+
+first_word = title[0]
+for count, word in enumerate(title[1:]):
+    if count == 0:
+        title_list.append(first_word + ' ' + word)
+    else:
+        title_list.append(title[count] + ' ' + word)
+        
+print(title_list)"""
+
+"""from prompt_toolkit import print_formatted_text, HTML
+actor_works_comment = str(HTML("\n<b>Popular Works:</b>"))
+print(actor_works_comment)
+
+word = "Zack Snyder's"
+
+if word[-2:] == "'s":
+    word = word[0:-2]
+    
+print(word)"""
+
+
+"""actor = imdb.get_person('0000129')
+print(actor.get('death date'))
+actor = imdb.get_person('0000054')
+print(actor.get('death date'))"""
