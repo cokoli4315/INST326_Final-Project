@@ -68,13 +68,13 @@ class Actor:
         self.awards = self.get_actor_awards(actor_id)
 
     def get_popular_movies(self, actor_id):
-        """Gets 3-5 of the most popular movies with the actor using a TSV file.
+        """Gets 4 of the most popular movies with the actor using a TSV file.
         
         Args:
             actor_id (int): the IMDB id of the actor
             
         Returns:
-            works (list of strings): 3-5 of the actor's most popular movies/shows with title & year released
+            works (list of strings): 4 of the actor's most popular movies/shows with title & year released
         """
         # look thru data.tsv for actor_id ('nm'+str(actor_id)), access row with their info, get last column (col[5]) that has  known for movies
         # split last col into a list using known_for = row[5].split(','), substring off the "tt" at the beginning of each movie id
