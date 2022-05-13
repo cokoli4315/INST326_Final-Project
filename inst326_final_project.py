@@ -179,6 +179,8 @@ def find_actor_page(actor_name):
         actor_id.append(row[0])
 
     index=-1
+    if row[1]==actor_name:
+        break
     for indv in actor_names:
         index+=1
         for j in range(len(actor_id)):
