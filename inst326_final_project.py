@@ -26,7 +26,6 @@ class Actor:
         works (list of strings): 4 of the actor's most popular movies/shows with title & year released
         awards (list of strings): 3-5 of some of the awards the actor has won
     """
-    # McKenna & Chikezie
     def __init__(self, actor_id):
         """Sets the attributes for the Actor.
         
@@ -68,7 +67,6 @@ class Actor:
         self.works = self.get_popular_movies(actor_id)
         self.awards = self.get_actor_awards(actor_id)
 
-    # McKenna & Declan
     def get_popular_movies(self, actor_id):
         """Gets 3-5 of the most popular movies with the actor using a TSV file.
         
@@ -100,7 +98,6 @@ class Actor:
                 
         return self.works
     
-    # McKenna & Declan
     def get_actor_awards(self, actor_id):
         """Gets 3-5 of the most recent awards the actor won using web scraping.
         
@@ -161,7 +158,6 @@ def get_post(post):
     """
     return post.title, post.id
 
-# Chikezie & Surafel    
 def find_actor(post_title, actor_names):
     """Looks for an actor's name in the title of a post using a csv file.
     
@@ -204,7 +200,6 @@ def find_actor(post_title, actor_names):
     
     return None
 
-# Chikezie & Surafel
 def find_actor_page(actor_name):
 
     """Looks through IMDB for the actor's page.
@@ -226,7 +221,6 @@ def find_actor_page(actor_name):
     
     return None
 
-# Surafel & McKenna
 def create_comment(actor, actor_id):
     """Creates a string comment with an Actor object's attributes.
     
@@ -266,7 +260,6 @@ Click [here](https://www.imdb.com/name/nm{actor_id}/) to learn more about the ac
  
 """ + mistakes_message)
 
-# Surafel & McKenna
 def publish_comment(post, comment):
     """Comments a string to a Reddit post.
     
@@ -276,7 +269,6 @@ def publish_comment(post, comment):
     
     post.reply(comment)
 
-# Chikezie, & Surafel
 def open_tsv_file(target, row_num):
     """Opens the TSV file once to be used for other functions.
     """
@@ -302,7 +294,6 @@ def get_imdb_actor_names():
     
     return actor_names
 
-# Chikenzie & Declan
 def main():
     """Runs the entire program. Calls get_post(), calls find_actor() using title, if a page for the actor is found creates an Actor instance, 
     calls create_comment() using the Actor instance, calls publish_comment() using the return of create_comment()."""
@@ -319,7 +310,7 @@ def main():
     actor_names = get_imdb_actor_names()
     movies_sub = reddit.subreddit("movies")
     
-    for count, submission in enumerate(movies_sub.new(limit=10)):
+    for count, submission in enumerate(movies_sub.new(limit=5)):
         post_title, post_id = get_post(submission)
         print(f"\n\033[1mPost #{count+1} Title:\033[0m \"{post_title}\" \t \033[1mPost ID:\033[0m {post_id}")
         actor_page = find_actor(post_title, actor_names)
