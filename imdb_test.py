@@ -96,8 +96,6 @@ for count, award in enumerate(all_awards):
     except AttributeError:
         continue
 
-for i in range(1):
-    print(awards_won)
 awards = []
 for count, award in enumerate(awards_won):
     award_html = award.find_all("td")
@@ -118,7 +116,6 @@ for count, award in enumerate(awards_won):
     if count > 3:
         break  
     
-print(awards)
 
 """import csv
 
@@ -184,3 +181,8 @@ print(word)"""
 print(actor.get('death date'))
 actor = imdb.get_person('0000054')
 print(actor.get('death date'))"""
+
+import csv
+tsv_file = open("data1.tsv", mode='r', encoding='utf8')
+read_tsv = csv.reader(tsv_file,delimiter="\t")
+print(len(tsv_file.readlines()))  

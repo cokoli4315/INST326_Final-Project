@@ -212,6 +212,7 @@ def find_actor(post_title, actor_names):
     actor_page = ''
     
     # uses the pairs of words in the title previously found to match with a potential actor's name identified in the post
+    # title_pair has to match name from actor_names list exactly (with punctuation and capitalization)
     for title_pair in title_pairs:
         if title_pair in actor_names:
             actor_name = title_pair
@@ -311,7 +312,7 @@ def publish_comment(post, comment):
     post.reply(comment)
 
 def open_tsv_file(target, row_num):
-    """Opens data.tsv file and tries to find a target within the file.
+    """Opens data.tsv files and tries to find a target within the files.
     
     Args:
         target (int/str): what is trying to be found within data.tsv
@@ -320,30 +321,56 @@ def open_tsv_file(target, row_num):
     Returns:
         the row as a list that the target is found on in the data.tsv file
     """
-    tsv_file=open('data.tsv', encoding='utf8')
+    tsv_file=open('data1.tsv', mode='r', encoding='utf8')
     read_tsv=csv.reader(tsv_file,delimiter="\t")
     
-    # goes through each row in data.tsv and checks if it holds the target
-    for row in read_tsv:
-        if row[row_num] == target:
-            return row
+    filename = 2
+    
+    # goes through each row in each data.tsv file and checks if it holds the target
+    while True:
+        # checks current tsv_file for target
+        for line in tsv_file:
+            for row in read_tsv:
+                if row[row_num] == target:
+                    tsv_file.close()
+                    return row
+            
+        # once one data.tsv file reaches its end, tsv_file gets reset to the next data.tsv file   
+        tsv_file = open('data'+str(filename)+'.tsv', mode='r', encoding='utf-8')
+        filename += 1
+        
+        if filename > 9:
+            tsv_file.close()
+            break
         
 def get_imdb_actor_names():
-    """Gets all actor names in data.tsv file.
+    """Gets all actor names in the data.tsv files.
     
     Returns:
         a list of strings with all the actor names found
     """
     actor_names=[]
     
-    file = open("data.tsv", encoding='utf8')
-    read_tsv = csv.reader(file,delimiter="\t")
+    tsv_file = open("data1.tsv", mode='r', encoding='utf8')
+    read_tsv = csv.reader(tsv_file,delimiter="\t")
+          
+    filename = 2
     
-    # goes through each row in data.tsv and adds the name column to actor_names
-    for row in read_tsv:
-        actor_names.append(row[1])
+    # goes through each row in data.tsv and adds the name column to actor_names 
+    while True:
+        # adds actor names from current data.tsv file
+        for line in tsv_file:
+            for row in read_tsv:
+                actor_names.append(row[1])
+                
+        # once end of a data.tsv file is reached, resets tsv_file to the next data.tsv file
+        tsv_file = open('data'+str(filename)+'.tsv', mode='r', encoding='utf-8')
+        filename += 1
+        
+        if filename > 9:
+            break
     
-    file.close()
+    tsv_file.close()
     
     return actor_names
 
