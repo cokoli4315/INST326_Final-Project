@@ -1,17 +1,15 @@
-One to four sentences explaining what your project is and what it does.
+**One to four sentences explaining what your project is and what it does.**
 
-	The concept of this project is to create a Reddit bot that searches through posts on r/movies and comments information about an actor. The bot collects information from IMDB about different actors using matches from Reddit. 
+The concept of this project is to create a Reddit bot that searches through posts on r/movies and comments information about an actor. The bot collects information from IMDB about different actors using matches from Reddit. 
  
-An explanation on how to run the program from the command line.
+**An explanation on how to run the program from the command line.**
 
 Running from the command line is simple, there are no arguments added. Just run “python inst326_final_project.py” for Windows or “python3 inst326_final_project.py” for Mac. Make sure BeautifulSoup, Cinemagoer, and PRAW are all downloaded (using pip) on the machine running the program. Additionally, all 9 of the data.tsv files should be in the same directory as the program. 
 
-Documentation on how to use the program / how to interpret the output of the program.
-
+**Documentation on how to use the program / how to interpret the output of the program.**
 There is not any input required to run the program, all the work is done within the program. Everything in the output is labelled, you can see the post title and ID, the actor’s IMDB ID (if it says None then an actor was not found in the post title and a comment is not made or posted), the comment that should be published to Reddit and a line that says to check Reddit for comment. Then you can go to r/movies on Reddit (here is a link), make sure it is sorted by new, and check the 5 most recent posts for comments. 
 
-An annotated bibliography of all sources you used to develop the program and how you used them.
-
+**An annotated bibliography of all sources you used to develop the program and how you used them.**
 Cruz, G. (2022). Web Scraping [Slides]. Panopto. https://umd.instructure.com/courses/1320811/modules/items/11297694
 	This source was used to better understand web scraping for the get_actor_awards() method. This source helped guide our use of BeautifulSoup and understanding of HTML for the purposes of uor web scraping needs. 
 PRAW: The Python Reddit API Wrapper — PRAW 7.6.0 documentation. (n.d.). Read the Docs. https://praw.readthedocs.io/en/stable/
