@@ -20,5 +20,5 @@ PRAW: The Python Reddit API Wrapper — PRAW 7.6.0 documentation. (n.d.). Read t
 Python Dates. (n.d.). W3Schools. https://www.w3schools.com/python/python_datetime.asp
 	This source was used to better understand the datetime module that was used in our code. It was used to determine the age of an actor, either by using today’s date or the date of their death. Additionally, it was used to reformat the birthday that is stored in Cinemagoer to look more like a string for the Reddit comment. 
 	
-	Quick start — Cinemagoer 6.8 documentation. (n.d.). Read the Docs. https://cinemagoer.readthedocs.io/en/latest/usage/quickstart.html 
+Quick start — Cinemagoer 6.8 documentation. (n.d.). Read the Docs. https://cinemagoer.readthedocs.io/en/latest/usage/quickstart.html 
 	This is the documentation for the IMDB API, which we used extensively. This was used to learn how to gain information on an actor, such as their IMDB page ID, and their basic information (such as name, date of birth, and place of birth). This is what the Actor __init__ uses to set the Actor class attributes.
